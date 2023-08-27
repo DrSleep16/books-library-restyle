@@ -73,10 +73,33 @@ def get_book_txt(url, book_number, folder='books/'):
     return str(file_path)
 
 
+def get_book_comments(book_number):
+    url = f"https://tululu.org/b{book_number}/"
+    response = requests.get(url)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, 'lxml')
+    comments = []
+
+    comment_divs = soup.find_all('div', class_='texts')
+    for comment_div in comment_divs:
+        comment_text = comment_div.find('span', class_='black')
+        if comment_text:
+            comments.append(comment_text.text.strip())
+
+    return comments
+
 
 if __name__ == '__main__':
     for book_number in range(10):
         url = f"https://tululu.org/txt.php?id={book_number+1}"
         # filepath = get_book_txt(url, str(book_number + 1), 'books/')
         # print(filepath)
-        img = get_book_cover(book_number)
+        # img = get_book_cover(book_number)
+        comments = get_book_comments(book_number)
+
+        if comments:
+            for i, comment in enumerate(comments, 1):
+                print(f"Comment {i}:\n{comment}\n")
+        else:
+            print("No comments found for this book.")
