@@ -4,6 +4,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 import pathvalidate
 import os
+import sys
 
 
 def check_for_redirect(response):
@@ -138,7 +139,14 @@ def parse_book_page(html_content):
 
 
 if __name__ == '__main__':
-    for book_number in range(10):
+    start_id, end_id = 0,10
+    if len(sys.argv) != 3:
+        print("Напиши: python main.py start_id end_id")
+    else:
+        start_id = int(sys.argv[1])
+        end_id = int(sys.argv[2])
+
+    for book_number in range(start_id, end_id):
         url = f"https://tululu.org/txt.php?id={book_number+1}"
         # filepath = get_book_txt(url, str(book_number + 1), 'books/')
         # img = get_book_cover(book_number)
