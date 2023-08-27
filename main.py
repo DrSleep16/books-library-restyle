@@ -25,7 +25,7 @@ def get_book_title(book_number):
         return "Unknown Title"
 
 
-def get_book_img(book_number):
+def get_book_cover(book_number):
     url = f"https://tululu.org/b{book_number}/"
     response = requests.get(url)
     response.raise_for_status()
@@ -52,7 +52,7 @@ def get_book_img(book_number):
         return None
 
 
-def download_txt(url, book_number, folder='books/'):
+def get_book_txt(url, book_number, folder='books/'):
     response = requests.get(url)
     response.raise_for_status()
 
@@ -77,6 +77,6 @@ def download_txt(url, book_number, folder='books/'):
 if __name__ == '__main__':
     for book_number in range(10):
         url = f"https://tululu.org/txt.php?id={book_number+1}"
-        # filepath = download_txt(url, str(book_number + 1), 'books/')
+        # filepath = get_book_txt(url, str(book_number + 1), 'books/')
         # print(filepath)
-        img = get_book_img(book_number)
+        img = get_book_cover(book_number)
