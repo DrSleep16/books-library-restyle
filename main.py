@@ -17,12 +17,11 @@ def get_book_title(book_number):
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, 'lxml')
-    book_title = soup.find('h1')
+    content_div = soup.find('div', id='content')
+    book_title = content_div.find('h1') if content_div else None
 
     if book_title:
         return book_title.text.split('::')[0].strip()
-    else:
-        return "Unknown Title"
 
 
 def get_book_cover(book_number):
@@ -96,10 +95,10 @@ if __name__ == '__main__':
         # filepath = get_book_txt(url, str(book_number + 1), 'books/')
         # print(filepath)
         # img = get_book_cover(book_number)
-        comments = get_book_comments(book_number)
-
-        if comments:
-            for i, comment in enumerate(comments, 1):
-                print(f"Comment {i}:\n{comment}\n")
-        else:
-            print("No comments found for this book.")
+        title = get_book_title(book_number)
+        if title:
+            print(title)
+            comments = get_book_comments(book_number)
+            if comments:
+                for i, comment in enumerate(comments, 1):
+                    print(f"Comment {i}:\n{comment}\n")
