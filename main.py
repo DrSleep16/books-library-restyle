@@ -140,23 +140,21 @@ def parse_book_page(html_content):
 
 if __name__ == '__main__':
     start_id, end_id = 0,10
-    if len(sys.argv) != 3:
-        print("Напиши: python main.py start_id end_id")
-    else:
+    if len(sys.argv) == 3:
         start_id = int(sys.argv[1])
         end_id = int(sys.argv[2])
 
     for book_number in range(start_id, end_id):
-        url = f"https://tululu.org/txt.php?id={book_number+1}"
-        # filepath = get_book_txt(url, str(book_number + 1), 'books/')
-        # img = get_book_cover(book_number)
+        url = f"https://tululu.org/txt.php?id={book_number}"
+        filepath = get_book_txt(url, str(book_number), 'books/')
+        img = get_book_cover(book_number)
         title = get_book_title(book_number)
         if title:
             print(title)
             comments = get_book_comments(book_number)
             if comments:
                 for i, comment in enumerate(comments, 1):
-                    print(f"Comment {i}:\n{comment}\n")
+                    print(f"Comment {i}:{comment}")
             genres = get_book_genres(book_number)
             if genres:
                 print(f"Жанры: {', '.join(genres)}")
