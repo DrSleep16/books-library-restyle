@@ -17,6 +17,11 @@ def get_book_title(book_number):
     response = requests.get(url)
     response.raise_for_status()
 
+    try:
+        check_for_redirect(response)
+    except requests.HTTPError:
+        return 'redirect'
+
     soup = BeautifulSoup(response.text, 'lxml')
     content_div = soup.find('div', id='content')
     book_title = content_div.find('h1') if content_div else None
@@ -29,6 +34,11 @@ def get_book_cover(book_number):
     url = f"https://tululu.org/b{book_number}/"
     response = requests.get(url)
     response.raise_for_status()
+
+    try:
+        check_for_redirect(response)
+    except requests.HTTPError:
+        return 'redirect'
 
     soup = BeautifulSoup(response.text, 'lxml')
     book_img = soup.find(class_='bookimage').find('img') if soup.find(class_='bookimage') else None
@@ -78,6 +88,11 @@ def get_book_comments(book_number):
     response = requests.get(url)
     response.raise_for_status()
 
+    try:
+        check_for_redirect(response)
+    except requests.HTTPError:
+        return 'redirect'
+
     soup = BeautifulSoup(response.text, 'lxml')
     comments = []
 
@@ -94,6 +109,11 @@ def get_book_genres(book_number):
     url = f"https://tululu.org/b{book_number}/"
     response = requests.get(url)
     response.raise_for_status()
+
+    try:
+        check_for_redirect(response)
+    except requests.HTTPError:
+        return 'redirect'
 
     soup = BeautifulSoup(response.text, 'lxml')
 
