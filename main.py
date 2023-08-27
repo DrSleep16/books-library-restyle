@@ -89,6 +89,19 @@ def get_book_comments(book_number):
     return comments
 
 
+def get_book_genres(book_number):
+    url = f"https://tululu.org/b{book_number}/"
+    response = requests.get(url)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    genre_elements = soup.select('span.d_book a')
+
+    genres = [genre.text.strip() for genre in genre_elements]
+
+    return genres
+
 if __name__ == '__main__':
     for book_number in range(10):
         url = f"https://tululu.org/txt.php?id={book_number+1}"
@@ -102,3 +115,6 @@ if __name__ == '__main__':
             if comments:
                 for i, comment in enumerate(comments, 1):
                     print(f"Comment {i}:\n{comment}\n")
+            genres = get_book_genres(book_number)
+            if genres:
+                print(f"Жанры: {', '.join(genres)}")
