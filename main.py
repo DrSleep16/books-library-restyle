@@ -97,11 +97,20 @@ if __name__ == '__main__':
     end_id = args.end_id
 
     for book_number in range(start_id, end_id):
-        url = f"https://tululu.org/b{book_number}/"
-        response = requests.get(url)
-        response.raise_for_status()
+        try:
+            url = f"https://tululu.org/b{book_number}/"
+            response = requests.get(url)
+            response.raise_for_status()
 
-        book = parse_book_page(response)
-        if book:
-            download_book(book_number, book_title=book['title'])
-            download_cover(book_number, book_img=book['img'])
+            book = parse_book_page(response)
+            if book:
+                download_book(book_number, book_title=book['title'])
+                download_cover(book_number, book_img=book['img'])
+
+        except requests.HTTPError:
+            sys.stderr.write("HTTPError\n")
+        except requests.ConnectionError:
+            sys.stderr.write("ConnectionError\n")
+            time.sleep(5)
+        except Exception:
+            sys.stderr.write("Error\n")
