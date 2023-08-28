@@ -15,35 +15,44 @@ def check_for_redirect(response):
 
 
 def parse_book_page(response):
-    check_for_redirect(response)
+    try:
+        check_for_redirect(response)
 
-    soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.text, 'lxml')
 
-    book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
+        book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
 
-    book_author = soup.select_one('h1 a')
-    if book_author:
-        book_author = book_author.text.strip()
+        book_author = soup.select_one('h1 a')
+        if book_author:
+            book_author = book_author.text.strip()
 
-    genre_elements = soup.select('span.d_book a')
-    genres = [genre.text.strip() for genre in genre_elements]
+        genre_elements = soup.select('span.d_book a')
+        genres = [genre.text.strip() for genre in genre_elements]
 
-    comments = []
-    comment_divs = soup.select('div.texts')
-    for comment_div in comment_divs:
-        comment_text = comment_div.select_one('span.black').text.strip()
-        comments.append(comment_text)
+        comments = []
+        comment_divs = soup.select('div.texts')
+        for comment_div in comment_divs:
+            comment_text = comment_div.select_one('span.black').text.strip()
+            comments.append(comment_text)
 
-    book_img = soup.select_one('div.bookimage img')
+        book_img = soup.select_one('div.bookimage img')
 
-    book = {
-        'title':book_title,
-        'author':book_author,
-        'genres':genres,
-        'comments':comments,
-        'img':book_img
-    }
-    return book
+        book = {
+            'title':book_title,
+            'author':book_author,
+            'genres':genres,
+            'comments':comments,
+            'img':book_img
+        }
+        return book
+
+    except requests.HTTPError:
+        sys.stderr.write("HTTPError\n")
+    except requests.ConnectionError:
+        sys.stderr.write("ConnectionError\n")
+        time.sleep(5)
+    except Exception:
+        sys.stderr.write("Error\n")
 
 
 def download_book(book_number, book_title):
@@ -88,19 +97,11 @@ if __name__ == '__main__':
     end_id = args.end_id
 
     for book_number in range(start_id, end_id):
-        try:
-            url = f"https://tululu.org/b{book_number}/"
-            response = requests.get(url)
-            response.raise_for_status()
+        url = f"https://tululu.org/b{book_number}/"
+        response = requests.get(url)
+        response.raise_for_status()
 
-            book = parse_book_page(response)
-            if book:
-                download_book(book_number, book_title=book['title'])
-                download_cover(book_number, book_img=book['img'])
-        except requests.HTTPError:
-            sys.stderr.write("HTTPError\n")
-        except requests.ConnectionError:
-            sys.stderr.write("ConnectionError\n")
-            time.sleep(5)
-        except Exception:
-            sys.stderr.write("Error\n")
+        book = parse_book_page(response)
+        if book:
+            download_book(book_number, book_title=book['title'])
+            download_cover(book_number, book_img=book['img'])
