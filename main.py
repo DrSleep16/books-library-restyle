@@ -77,7 +77,6 @@ if __name__ == '__main__':
     for book_number in range(start_id, end_id):
         title, author, genres, comments, img = parse_book_page(book_number)
         if title:
-            print(f"Название: {title}")
             print(f"Автор: {author}")
             if genres:
                 print(f"Жанры: {', '.join(genres)}")
