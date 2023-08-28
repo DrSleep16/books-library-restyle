@@ -127,34 +127,36 @@ def get_book_genres(book_number):
 def parse_book_page(html_content):
     soup = BeautifulSoup(html_content, 'lxml')
 
-    book = {}
-
     book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
-    book['title'] = book_title
 
     book_author = soup.select_one('span[itemprop="author"] a')
     if book_author:
-        book['author'] = book_author.text.strip()
+        book_author = book_author.text.strip()
     else:
-        book['author'] = "Unknown Author"
+        book_author = "Unknown Author"
 
     genre_elements = soup.select('span.d_book a')
     genres = [genre.text.strip() for genre in genre_elements]
-    book['genres'] = genres
 
     comments = []
     comment_divs = soup.select('div.texts')
     for comment_div in comment_divs:
         comment_text = comment_div.select_one('span.black').text.strip()
         comments.append(comment_text)
-    book['comments'] = comments
 
     book_img = soup.select_one('div.bookimage img')
     if book_img:
-        book['image_url'] = book_img['src']
+        book_img = book_img['src']
     else:
-        book['image_url'] = None
+        book_img = None
 
+    book = {
+        'title': book_title,
+        'author': book_author,
+        'genres': genres,
+        'comments': comments,
+        'image_url': book_img
+    }
     return book
 
 
