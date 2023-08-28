@@ -168,16 +168,20 @@ if __name__ == '__main__':
     end_id = args.end_id
 
     for book_number in range(start_id, end_id):
-        url = f"https://tululu.org/txt.php?id={book_number}"
+        params = {
+            'id':str(book_number)
+        }
+        url = requests.get("https://tululu.org/txt.php", params=params).url
         filepath = get_book_txt(url, str(book_number), 'books/')
         img = get_book_cover(book_number)
         title = get_book_title(book_number)
         if title:
             print(title)
+            genres = get_book_genres(book_number)
+            if genres:
+                print(f"Жанры: {', '.join(genres)}")
             comments = get_book_comments(book_number)
             if comments:
                 for i, comment in enumerate(comments, 1):
                     print(f"Comment {i}:{comment}")
-            genres = get_book_genres(book_number)
-            if genres:
-                print(f"Жанры: {', '.join(genres)}")
+
