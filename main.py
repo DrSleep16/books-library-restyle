@@ -4,7 +4,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 import pathvalidate
 import os
-import sys
+import argparse
 
 
 def check_for_redirect(response):
@@ -159,10 +159,13 @@ def parse_book_page(html_content):
 
 
 if __name__ == '__main__':
-    start_id, end_id = 0,10
-    if len(sys.argv) == 3:
-        start_id = int(sys.argv[1])
-        end_id = int(sys.argv[2])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("start_id", type=int, help="Начальная страница")
+    parser.add_argument("end_id", type=int, help="Последняя страница")
+    args = parser.parse_args()
+
+    start_id = args.start_id
+    end_id = args.end_id
 
     for book_number in range(start_id, end_id):
         url = f"https://tululu.org/txt.php?id={book_number}"
