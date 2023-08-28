@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import sys
+import time
+
 import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -125,39 +128,48 @@ def get_book_genres(book_number):
 
 
 def parse_book_page(html_content):
-    soup = BeautifulSoup(html_content, 'lxml')
+    try:
+        soup = BeautifulSoup(html_content, 'lxml')
 
-    book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
+        book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
 
-    book_author = soup.select_one('span[itemprop="author"] a')
-    if book_author:
-        book_author = book_author.text.strip()
-    else:
-        book_author = "Unknown Author"
+        book_author = soup.select_one('span[itemprop="author"] a')
+        if book_author:
+            book_author = book_author.text.strip()
+        else:
+            book_author = "Unknown Author"
 
-    genre_elements = soup.select('span.d_book a')
-    genres = [genre.text.strip() for genre in genre_elements]
+        genre_elements = soup.select('span.d_book a')
+        genres = [genre.text.strip() for genre in genre_elements]
 
-    comments = []
-    comment_divs = soup.select('div.texts')
-    for comment_div in comment_divs:
-        comment_text = comment_div.select_one('span.black').text.strip()
-        comments.append(comment_text)
+        comments = []
+        comment_divs = soup.select('div.texts')
+        for comment_div in comment_divs:
+            comment_text = comment_div.select_one('span.black').text.strip()
+            comments.append(comment_text)
 
-    book_img = soup.select_one('div.bookimage img')
-    if book_img:
-        book_img = book_img['src']
-    else:
-        book_img = None
+        book_img = soup.select_one('div.bookimage img')
+        if book_img:
+            book_img = book_img['src']
+        else:
+            book_img = None
 
-    book = {
-        'title': book_title,
-        'author': book_author,
-        'genres': genres,
-        'comments': comments,
-        'image_url': book_img
-    }
-    return book
+        book = {
+            'title': book_title,
+            'author': book_author,
+            'genres': genres,
+            'comments': comments,
+            'image_url': book_img
+        }
+        return book
+
+    except requests.exceptions.HTTPError as e:
+        sys.stderr.write(f"HTTPError: {e}\n")
+    except requests.exceptions.ConnectionError as e:
+        sys.stderr.write(f"ConnectionError: {e}\n")
+        time.sleep(5)
+    except Exception as e:
+        sys.stderr.write(f"An error occurred: {e}\n")
 
 
 if __name__ == '__main__':
