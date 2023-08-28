@@ -3,10 +3,7 @@ import sys
 import time
 
 import requests
-from pathlib import Path
 from bs4 import BeautifulSoup
-import pathvalidate
-import os
 import argparse
 
 
@@ -54,13 +51,11 @@ def parse_book_page(book_number):
 
         return book_title, book_author, genres, comments, book_img
 
-    except requests.exceptions.HTTPError as e:
+    except requests.HTTPError as e:
         sys.stderr.write(f"HTTPError: {e}\n")
-    except requests.exceptions.ConnectionError as e:
+    except requests.ConnectionError as e:
         sys.stderr.write(f"ConnectionError: {e}\n")
         time.sleep(5)
-    except Exception as e:
-        sys.stderr.write(f"An error occurred: {e}\n")
 
     return None, None, None, None, None
 
@@ -82,4 +77,5 @@ if __name__ == '__main__':
                 print(f"Жанры: {', '.join(genres)}")
             if comments:
                 for i, comment in enumerate(comments, 1):
-                    print(f"Comment {i}: {comment}")
+                    print(f"Comment {i}: {comment}"
+                          )
