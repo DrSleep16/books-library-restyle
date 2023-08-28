@@ -178,7 +178,6 @@ if __name__ == '__main__':
         img = get_book_cover(book_number)
         title = get_book_title(book_number)
         if title:
-            print(title)
             genres = get_book_genres(book_number)
             if genres:
                 print(f"Жанры: {', '.join(genres)}")
