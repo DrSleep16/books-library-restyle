@@ -54,13 +54,13 @@ def download_book(book_number, book_title):
     check_for_redirect(response)
     Path('books/').mkdir(parents=True, exist_ok=True)
     safe_filename = pathvalidate.sanitize_filename(f'{book_number}. {book_title}')
-    file_path = Path('books/') / (safe_filename + '.txt')
+    file_path = Path(f'books/{safe_filename}.txt')
     with open(file_path, 'w') as file:
         file.write(response.text)
 
 
 def download_cover(book_number, book_img):
-    img_url = 'https://tululu.org' + book_img['src']
+    img_url = f"https://tululu.org{book_img['src']}"
     img_response = requests.get(img_url)
     img_response.raise_for_status()
     os.makedirs('images', exist_ok=True)
@@ -98,5 +98,5 @@ if __name__ == '__main__':
         except requests.ConnectionError:
             sys.stderr.write("ConnectionError\n")
             time.sleep(5)
-        except Exception:
-            sys.stderr.write("Error\n")
+        except Exception as e:
+            sys.stderr.write(f"Error: {str(e)}\n")
