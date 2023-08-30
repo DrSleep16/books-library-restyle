@@ -3,6 +3,8 @@ import os
 import sys
 import time
 from pathlib import Path
+from urllib.parse import urljoin
+
 import pathvalidate
 import requests
 from bs4 import BeautifulSoup
@@ -60,7 +62,9 @@ def download_book(book_number, book_title):
 
 
 def download_cover(book_number, book_img):
-    img_url = f"https://tululu.org{book_img['src']}"
+    base_url = "https://tululu.org"
+    relative_url = book_img['src']
+    img_url = urljoin(base_url, relative_url)
     img_response = requests.get(img_url)
     img_response.raise_for_status()
     os.makedirs('images', exist_ok=True)
