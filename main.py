@@ -15,8 +15,6 @@ def check_for_redirect(response):
 
 
 def parse_book_page(response):
-
-
     soup = BeautifulSoup(response.text, 'lxml')
 
     book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
@@ -47,35 +45,33 @@ def parse_book_page(response):
 
 
 def download_book(book_number, book_title):
-    if book_title:
-        params = {
-            'id':book_number
-        }
-        url = "https://tululu.org/txt.php"
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        check_for_redirect(response)
-        Path('books/').mkdir(parents=True, exist_ok=True)
-        safe_filename = pathvalidate.sanitize_filename(f'{book_number}. {book_title}')
-        file_path = Path('books/') / (safe_filename + '.txt')
-        with open(file_path, 'w') as file:
-            file.write(response.text)
+    params = {
+        'id':book_number
+    }
+    url = "https://tululu.org/txt.php"
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    check_for_redirect(response)
+    Path('books/').mkdir(parents=True, exist_ok=True)
+    safe_filename = pathvalidate.sanitize_filename(f'{book_number}. {book_title}')
+    file_path = Path('books/') / (safe_filename + '.txt')
+    with open(file_path, 'w') as file:
+        file.write(response.text)
 
 
 def download_cover(book_number, book_img):
-    if book_img:
-        img_url = 'https://tululu.org' + book_img['src']
-        img_response = requests.get(img_url)
-        img_response.raise_for_status()
-        os.makedirs('images', exist_ok=True)
+    img_url = 'https://tululu.org' + book_img['src']
+    img_response = requests.get(img_url)
+    img_response.raise_for_status()
+    os.makedirs('images', exist_ok=True)
 
-        if img_url.endswith('nopic.gif'):
-            book_img = 'images/nopic.gif'
-        else:
-            book_img = f'images/{book_number}.jpg'
+    if img_url.endswith('nopic.gif'):
+        book_img = 'images/nopic.gif'
+    else:
+        book_img = f'images/{book_number}.jpg'
 
-        with open(book_img, 'wb') as img_file:
-            img_file.write(img_response.content)
+    with open(book_img, 'wb') as img_file:
+        img_file.write(img_response.content)
 
 
 if __name__ == '__main__':
@@ -94,9 +90,8 @@ if __name__ == '__main__':
             response.raise_for_status()
 
             book = parse_book_page(response)
-            if book:
-                download_book(book_number, book_title=book['title'])
-                download_cover(book_number, book_img=book['img'])
+            download_book(book_number, book_title=book['title'])
+            download_cover(book_number, book_img=book['img'])
 
         except requests.HTTPError:
             sys.stderr.write("HTTPError\n")
