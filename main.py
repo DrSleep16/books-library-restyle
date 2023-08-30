@@ -88,7 +88,7 @@ def download_cover(book_number, book_img):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Скрипт для парсинга библиотеки')
     parser.add_argument("start_id", type=int, help="Начальная страница")
     parser.add_argument("end_id", type=int, help="Последняя страница")
     args = parser.parse_args()
