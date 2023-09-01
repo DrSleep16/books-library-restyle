@@ -62,7 +62,7 @@ def download_book(book_number, book_title):
 
 
 def download_cover(book_number, book_img):
-    base_url = "https://tululu.org"
+    base_url = "https://tululu.org/b"
     relative_url = book_img['src']
     img_url = urljoin(base_url, relative_url)
     img_response = requests.get(img_url)
