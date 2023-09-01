@@ -102,5 +102,3 @@ if __name__ == '__main__':
         except requests.ConnectionError:
             sys.stderr.write("ConnectionError\n")
             time.sleep(5)
-        except AttributeError as e:
-            sys.stderr.write("AttributeError\n")
