@@ -92,7 +92,7 @@ if __name__ == '__main__':
             url = f"https://tululu.org/b{book_number}/"
             response = requests.get(url)
             response.raise_for_status()
-
+            check_for_redirect(response)
             book = parse_book_page(response)
             download_book(book_number, book_title=book['title'])
             download_cover(book_number, book_img=book['img'])
