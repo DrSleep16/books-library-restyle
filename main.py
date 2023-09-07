@@ -61,14 +61,13 @@ def download_book(book_number, book_title):
         file.write(response.text)
 
 
-def download_cover(book_number, book_img):
+def download_cover(book_number, relative_url):
     book_url = f"https://tululu.org/b{book_number}/"
     response = requests.get(book_url)
     response.raise_for_status()
 
     base_url = response.url
 
-    relative_url = book_img['src']
     img_url = urljoin(base_url, relative_url)
     img_response = requests.get(img_url)
     img_response.raise_for_status()
@@ -100,7 +99,7 @@ if __name__ == '__main__':
             check_for_redirect(response)
             book = parse_book_page(response)
             download_book(book_number, book_title=book['title'])
-            download_cover(book_number, book_img=book['img'])
+            download_cover(book_number, relative_url=book['img']['src'])
 
         except requests.HTTPError:
             sys.stderr.write("HTTPError\n")
