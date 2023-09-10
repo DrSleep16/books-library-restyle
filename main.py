@@ -2,18 +2,15 @@
 import os
 import sys
 import time
-from pathlib import Path
-from urllib.parse import urljoin
-
-import pathvalidate
+import json
+from pathvalidate import sanitize_filename
 import requests
-from bs4 import BeautifulSoup
 import argparse
 
-
-def check_for_redirect(response):
-    if response.history:
-        raise requests.HTTPError
+from urllib.parse import urljoin, urlparse
+from bs4 import BeautifulSoup
+from check_for_redirect import check_for_redirect
+from parse_tululu_category import get_urls_books
 
 
 def parse_book_page(response):
@@ -35,70 +32,95 @@ def parse_book_page(response):
         comments.append(comment_text)
 
     book_img = soup.select_one('div.bookimage img')
+    book_img_url = book_img['src'] if book_img else None
 
     book = {
         'title':book_title,
         'author':book_author,
         'genres':genres,
         'comments':comments,
-        'img':book_img
+        'img':book_img_url
     }
+
     return book
 
 
-def download_book(book_number, book_title):
-    params = {
-        'id':book_number
-    }
-    url = "https://tululu.org/txt.php"
+def download_book(url, params, filename, folder='books/'):
+    os.makedirs(folder, exist_ok=True)
     response = requests.get(url, params=params)
     response.raise_for_status()
     check_for_redirect(response)
-    Path('books/').mkdir(parents=True, exist_ok=True)
-    safe_filename = pathvalidate.sanitize_filename(f'{book_number}. {book_title}')
-    file_path = Path(f'books/{safe_filename}.txt')
-    with open(file_path, 'w') as file:
+    file_path = os.path.join(folder, sanitize_filename(filename))
+    with open(file_path, 'w', encoding='utf-8') as file:
         file.write(response.text)
 
 
-def download_cover(book_number, relative_url):
-    base_url = f"https://tululu.org/b{book_number}/"
+def download_cover(url, folder='/images'):
+    os.makedirs(folder, exist_ok=True)
+    response = requests.get(url)
+    response.raise_for_status()
 
-    img_url = urljoin(base_url, relative_url)
-    img_response = requests.get(img_url)
-    img_response.raise_for_status()
-    os.makedirs('images', exist_ok=True)
+    file_name = os.path.basename(urlparse(url).path)
+    file_number = file_name.replace("images", "")
+    new_file_name = os.path.join(folder, file_number)
 
-    if img_url.endswith('nopic.gif'):
-        book_img = 'images/nopic.gif'
-    else:
-        book_img = f'images/{book_number}.jpg'
-
-    with open(book_img, 'wb') as img_file:
-        img_file.write(img_response.content)
+    with open(new_file_name, 'wb') as file:
+        file.write(response.content)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Скрипт для парсинга библиотеки')
-    parser.add_argument("start_id", type=int, help="Начальная страница")
-    parser.add_argument("end_id", type=int, help="Последняя страница")
+    parser = argparse.ArgumentParser(
+        description='Скрипт для парсинга библиотеки'
+    )
+    parser.add_argument(
+        'start_page',
+        help='Начальная страница',
+        default=1,
+        type=int
+    )
+    parser.add_argument(
+        'end_page',
+        help='Последняя страница',
+        default=10,
+        type=int
+    )
+
     args = parser.parse_args()
 
-    start_id = args.start_id
-    end_id = args.end_id
+    start_page = args.start_page
+    end_page = args.end_page
 
-    for book_number in range(start_id, end_id):
+    books = []
+    books_urls = get_urls_books(start_page, end_page)
+    loading_book_url = "https://tululu.org/txt.php"
+
+    for book_url in books_urls:
+        book_number = urlparse(book_url).path.split("/")[1][1:]
+        params = {"id": book_number}
         try:
-            url = f"https://tululu.org/b{book_number}/"
-            response = requests.get(url)
-            response.raise_for_status()
-            check_for_redirect(response)
-            book = parse_book_page(response)
-            download_book(book_number, book_title=book['title'])
-            download_cover(book_number, relative_url=book['img']['src'])
+            book_response = requests.get(loading_book_url, params)
+
+            book_response.raise_for_status()
+            check_for_redirect(book_response)
+
+            page_response = requests.get(book_url)
+            page_response.raise_for_status()
+            check_for_redirect(page_response)
+
+            book = parse_book_page(page_response)
+            books.append(book)
+            img_file_path = book["img"]
+
+            full_img_url = urljoin(book_url, img_file_path)
+            download_cover(full_img_url, 'images')
+
+            book_filename = f"{book['title']}.txt"
+            download_book(loading_book_url, params, book_filename, 'books')
 
         except requests.HTTPError:
             sys.stderr.write("HTTPError\n")
         except requests.ConnectionError:
             sys.stderr.write("ConnectionError\n")
             time.sleep(5)
+    with open("book_parse.json", 'w', encoding="utf-8") as json_file:
+        json.dump(books, json_file, ensure_ascii=False)
