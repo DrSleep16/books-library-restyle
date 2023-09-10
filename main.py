@@ -84,6 +84,16 @@ if __name__ == '__main__':
         default=10,
         type=int
     )
+    parser.add_argument(
+        '--skip_imgs',
+        help='не скачивать картинки',
+        action="store_true"
+    )
+    parser.add_argument(
+        '--skip_txt',
+        help='не скачивать книги',
+        action="store_true"
+    )
 
     args = parser.parse_args()
 
@@ -110,12 +120,12 @@ if __name__ == '__main__':
             book = parse_book_page(page_response)
             books.append(book)
             img_file_path = book["img"]
-
-            full_img_url = urljoin(book_url, img_file_path)
-            download_cover(full_img_url, 'images')
-
-            book_filename = f"{book['title']}.txt"
-            download_book(loading_book_url, params, book_filename, 'books')
+            if not args.skip_imgs:
+                full_img_url = urljoin(book_url, img_file_path)
+                download_cover(full_img_url, 'images')
+            if not args.skip_txt:
+                book_filename = f"{book['title']}.txt"
+                download_book(loading_book_url, params, book_filename, 'books')
 
         except requests.HTTPError:
             sys.stderr.write("HTTPError\n")
