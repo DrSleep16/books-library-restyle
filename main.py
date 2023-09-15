@@ -114,11 +114,6 @@ if __name__ == '__main__':
         book_number = urlparse(book_url).path.split("/")[1][1:]
         params = {"id": book_number}
         try:
-            book_response = requests.get(loading_book_url, params)
-
-            book_response.raise_for_status()
-            check_for_redirect(book_response)
-
             page_response = requests.get(book_url)
             page_response.raise_for_status()
             check_for_redirect(page_response)
