@@ -94,6 +94,12 @@ if __name__ == '__main__':
         help='не скачивать книги',
         action="store_true"
     )
+    parser.add_argument(
+        '--dest_folder',
+        help='путь к картинкам, книгам, JSON',
+        default="media",
+        type=str
+    )
 
     args = parser.parse_args()
 
@@ -122,15 +128,23 @@ if __name__ == '__main__':
             img_file_path = book["img"]
             if not args.skip_imgs:
                 full_img_url = urljoin(book_url, img_file_path)
-                download_cover(full_img_url, 'images')
+                folder = 'images'
+                path = os.path.join(args.dest_folder, folder)
+                download_cover(full_img_url, path)
             if not args.skip_txt:
                 book_filename = f"{book['title']}.txt"
-                download_book(loading_book_url, params, book_filename, 'books')
+                folder = 'books'
+                path = os.path.join(args.dest_folder, folder)
+                download_book(loading_book_url, params, book_filename, path)
 
         except requests.HTTPError:
             sys.stderr.write("HTTPError\n")
         except requests.ConnectionError:
             sys.stderr.write("ConnectionError\n")
             time.sleep(5)
-    with open("book_parse.json", 'w', encoding="utf-8") as json_file:
+    folder = args.dest_folder
+    os.makedirs(folder, exist_ok=True)
+    filename = "book_parse.json"
+    path = os.path.join(folder, sanitize_filename(filename))
+    with open(path, 'w', encoding="utf-8") as json_file:
         json.dump(books, json_file, ensure_ascii=False)
