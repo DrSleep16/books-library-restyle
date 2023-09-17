@@ -12,7 +12,7 @@ def rebuild():
     render_html = template.render(books=books)
     with open("index.html", 'w', encoding="utf-8") as html_file:
         html_file.write(render_html)
-    print("Site rebuilt")
+
 
 rebuild()
 server = Server()
