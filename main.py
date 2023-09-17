@@ -13,7 +13,7 @@ from check_for_redirect import check_for_redirect
 from parse_tululu_category import get_urls_books
 
 
-def parse_book_page(response):
+def parse_book_page(book_url, response):
     soup = BeautifulSoup(response.text, 'lxml')
 
     book_title = soup.select_one('div#content h1').text.split('::')[0].strip()
@@ -39,7 +39,7 @@ def parse_book_page(response):
         'author':book_author,
         'genres':genres,
         'comments':comments,
-        'img':book_img_url
+        'img':urljoin(book_url, book_img_url)
     }
 
     return book
@@ -118,11 +118,10 @@ if __name__ == '__main__':
             page_response.raise_for_status()
             check_for_redirect(page_response)
 
-            book = parse_book_page(page_response)
+            book = parse_book_page(book_url, page_response)
             books.append(book)
-            img_file_path = book["img"]
+            full_img_url = book["img"]
             if not args.skip_imgs:
-                full_img_url = urljoin(book_url, img_file_path)
                 folder = 'images'
                 path = os.path.join(args.dest_folder, folder)
                 download_cover(full_img_url, path)
