@@ -32,4 +32,4 @@ if __name__ == '__main__':
     rebuild()
     server = Server()
     server.watch('template.html', rebuild)
-    server.serve(root='')
+    server.serve(root='.')
