@@ -7,7 +7,7 @@ import argparse
 
 from jinja2 import Environment, FileSystemLoader
 from livereload import Server
-from urllib.parse import urlencode, quote, unquote
+from urllib.parse import quote, unquote
 
 
 def rebuild(json_file_path):
