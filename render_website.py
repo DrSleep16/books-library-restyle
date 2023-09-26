@@ -10,22 +10,22 @@ from livereload import Server
 
 
 def rebuild(json_file_path):
-    with open(json_file_path, 'r', encoding="utf-8") as json_file:
+    with open(json_file_path, 'r', encoding='utf-8') as json_file:
         books = json.load(json_file)
     total_books = len(books)
     books_per_page = 20
     book_pages = list(more_itertools.chunked(books, books_per_page))
     total_pages = math.ceil(total_books / books_per_page)
     for page_num, page_books in enumerate(book_pages, start=1):
-        env = Environment(loader=FileSystemLoader("."))
-        template = env.get_template("template.html")
+        env = Environment(loader=FileSystemLoader('.'))
+        template = env.get_template('template.html')
         render_html = template.render(
             books=page_books,
             current_page=page_num,
             total_pages=total_pages
         )
-        page_filename = f"pages/index{page_num}.html"
-        with open(page_filename, 'w', encoding="utf-8") as html_file:
+        page_filename = f'pages/index{page_num}.html'
+        with open(page_filename, 'w', encoding='utf-8') as html_file:
             html_file.write(render_html)
 
 
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    if not os.path.exists("pages"):
-        os.makedirs("pages")
+    if not os.path.exists('pages'):
+        os.makedirs('pages')
 
     rebuild(args.json)
     server = Server()
