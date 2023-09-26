@@ -13,8 +13,9 @@ def rebuild(json_file_path):
     with open(json_file_path, 'r', encoding="utf-8") as json_file:
         books = json.load(json_file)
     total_books = len(books)
-    book_pages = list(more_itertools.chunked(books, 20))
-    total_pages = math.ceil(total_books / 20)
+    books_per_page = 20
+    book_pages = list(more_itertools.chunked(books, books_per_page))
+    total_pages = math.ceil(total_books / books_per_page)
     for page_num, page_books in enumerate(book_pages, start=1):
         env = Environment(loader=FileSystemLoader("."))
         template = env.get_template("template.html")
