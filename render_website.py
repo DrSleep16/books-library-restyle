@@ -1,14 +1,16 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 import more_itertools
 import math
+import argparse
 
 from jinja2 import Environment, FileSystemLoader
 from livereload import Server
 
 
-def rebuild():
-    with open("media/book_parse.json", 'r', encoding="utf-8") as json_file:
+def rebuild(json_file_path):
+    with open(json_file_path, 'r', encoding="utf-8") as json_file:
         books = json.load(json_file)
     total_books = len(books)
     book_pages = list(more_itertools.chunked(books, 20))
@@ -27,9 +29,18 @@ def rebuild():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--json',
+        default='media/book_parse.json',
+        help='Путь к файлу book_parse.json'
+    )
+    args = parser.parse_args()
+
     if not os.path.exists("pages"):
         os.makedirs("pages")
-    rebuild()
+
+    rebuild(args.json)
     server = Server()
-    server.watch('template.html', rebuild)
+    server.watch('template.html', lambda: rebuild(args.json))
     server.serve(root='.')
