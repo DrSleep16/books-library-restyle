@@ -119,7 +119,7 @@ if __name__ == '__main__':
             check_for_redirect(page_response)
 
             book = parse_book_page(book_url, page_response)
-            books.append(book)
+
             full_img_url = book["img"]
             if not args.skip_imgs:
                 folder = 'images'
@@ -130,12 +130,13 @@ if __name__ == '__main__':
                 folder = 'books'
                 path = os.path.join(args.dest_folder, folder)
                 download_book(loading_book_url, params, book_filename, path)
-
-        except requests.HTTPError:
-            sys.stderr.write("HTTPError\n")
-        except requests.ConnectionError:
+        except requests.exceptions.HTTPError:
+            print("Такой книги нет", book_url)
+        except ConnectionError:
             sys.stderr.write("ConnectionError\n")
             time.sleep(5)
+        else:
+            books.append(book)
     folder = args.dest_folder
     os.makedirs(folder, exist_ok=True)
     filename = "book_parse.json"
