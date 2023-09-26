@@ -7,6 +7,7 @@ import argparse
 
 from jinja2 import Environment, FileSystemLoader
 from livereload import Server
+from urllib.parse import urlencode, quote, unquote
 
 
 def rebuild(json_file_path):
@@ -19,10 +20,14 @@ def rebuild(json_file_path):
     for page_num, page_books in enumerate(book_pages, start=1):
         env = Environment(loader=FileSystemLoader('.'))
         template = env.get_template('template.html')
+        for book in page_books:
+            book['img'] = quote(book['img'], safe='/:')
+            book['title'] = quote(book['title'], safe='/:')
+            book['title'] = unquote(book['title']).replace(':', '')
         render_html = template.render(
             books=page_books,
             current_page=page_num,
-            total_pages=total_pages
+            total_pages=total_pages,
         )
         page_filename = f'pages/index{page_num}.html'
         with open(page_filename, 'w', encoding='utf-8') as html_file:

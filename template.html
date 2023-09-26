@@ -40,7 +40,7 @@
            <div class="card mb-3" style="max-width: 540px;">
             <div class="row no-gutters">
               <div class="col-md-6">
-                <img src="{{book.img}}" class="card-img" alt="{{book.title}} обложка книги">
+                <img src="{{book['img']}}" class="card-img" alt="{{book['title']}} обложка книги">
               </div>
               <div class="col-md-6">
                 <div class="card-body">
@@ -51,7 +51,7 @@
                   {%endfor%}
                   <p class="card-text">
                     <small class="text-muted">
-                      <a href="../media/books/{{book.title}}.txt" target="_blank">Читать</a>
+                      <a href="../media/books/{{book['title']}}.txt" target="_blank">Читать</a>
                     </small>
                   </p>
                 </div>
