@@ -21,7 +21,7 @@ def get_book_headers(soup):
 
 def download_txt(response, book_name, folder='media/books/'):
     txt_name = f'{sanitize_filename(book_name)}.txt'
-    book_path = os.path.join(folder, txt_name)
+    book_path = os.path.join(folder, txt_name).replace("\\", "//")
     with open(book_path, 'wb') as file:
         file.write(response.content)
     return book_path
@@ -37,7 +37,7 @@ def download_image(image_link, folder='media/images/'):
     response = requests.get(image_link)
     response.raise_for_status()
     image_name = image_link.split('/')[-1]
-    image_path = os.path.join(folder, image_name)
+    image_path = os.path.join(folder, image_name).replace("\\", "//")
     with open(image_path, 'wb') as file:
         file.write(response.content)
     return image_path
