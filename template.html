@@ -37,27 +37,27 @@
       <div class="row">
         {%for book in books%}
           <div class="col-md-6">
-           <div class="card mb-3" style="max-width: 540px;">
-            <div class="row no-gutters">
-              <div class="col-md-6">
-                <img src="../{{book['image_src'] | urlencode}}" class="card-img" alt="{{book['title']}} обложка книги">
-              </div>
-              <div class="col-md-6">
-                <div class="card-body">
-                  <h5 class="card-title">Название - {{book.title}}</h5>
-                  <p class="card-text">Автор - {{book.author}}</p>
-                  {%for genre in book.genres%}
-                    <span class="badge badge-light">{{genre}}</span>
-                  {%endfor%}
-                  <p class="card-text">
-                    <small class="text-muted">
-                      <a href="../{{book['book_path'] | urlencode}}" target="_blank">Читать</a>
-                    </small>
-                  </p>
+            <div class="card mb-3" style="max-width: 540px;">
+              <div class="row no-gutters">
+                <div class="col-md-6">
+                  <img src="../{{book['image_src'] | urlencode}}" class="card-img" alt="{{book['title']}} обложка книги">
+                </div>
+                <div class="col-md-6">
+                  <div class="card-body">
+                    <h5 class="card-title">Название - {{book.title}}</h5>
+                    <p class="card-text">Автор - {{book.author}}</p>
+                    {%for genre in book.genres%}
+                      <span class="badge badge-light">{{genre}}</span>
+                    {%endfor%}
+                    <p class="card-text">
+                      <small class="text-muted">
+                        <a href="../{{book['book_path'] | urlencode}}" target="_blank">Читать</a>
+                      </small>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-           </div>
           </div>
         {%endfor%}
       </div>
